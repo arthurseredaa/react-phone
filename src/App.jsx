@@ -15,7 +15,7 @@ function App() {
     if (token) {
       dispatch(userLoginWithToken());
     }
-  }, []);
+  }, [dispatch, token]);
 
   return (
     <>
