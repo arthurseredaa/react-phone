@@ -9,13 +9,13 @@ export const setConfig = (config) => ({ type: SET_CONFIG, config });
 export const userLogin = (data) => async (dispatch) => {
   dispatch(setLoading(true));
 
-  const { status, data: responseData } = await authApi.login(data);
+  const { status, data: response } = await authApi.login(data);
 
   if (status === 200) {
-    dispatch(setConfig(responseData.data));
-    localStorage.setItem("token", responseData.data.token);
-    dispatch(setLoading(false));
+    dispatch(setConfig(response.data));
     dispatch(setLogin(true));
+    localStorage.setItem("token", response.data.token);
+    dispatch(setLoading(false));
   }
 
   dispatch(setLoading(false));
@@ -29,8 +29,8 @@ export const userLoginWithToken = () => async (dispatch) => {
   const { status, data } = await authApi.loginWithToken(token);
 
   if (status === 200) {
+    dispatch(setConfig(data.data));
     dispatch(setLogin(true));
-    dispatch(setConfig(data));
     dispatch(setLoading(false));
   }
 
