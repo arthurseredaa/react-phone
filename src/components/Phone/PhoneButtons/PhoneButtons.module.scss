@@ -1,0 +1,27 @@
+.dialpadButton {
+  background-color: var(--figma-gray);
+  color: #AEAEAE;
+  font-family: "Roboto";
+  outline: none;
+  width: 60px;
+  height: 24px;
+}
+
+.callButton {
+  background-color: #6DD453;
+}
+
+.rectangle {
+  width: 40px;
+  height: 33px;
+  border: 1px solid #C4C4C4;
+  border-radius: 2px;
+}
+
+.triangle {
+  width: 0;
+  height: 0;
+  border-top: 50px solid transparent;
+  border-right: 100px solid  #C4C4C4;
+  border-bottom: 50px solid transparent;
+}

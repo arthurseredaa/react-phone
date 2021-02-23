@@ -1,0 +1,9 @@
+.controlButton:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 5%;
+  width: 65px;
+  height: 3px;
+  background-color: #6DD453;
+}
