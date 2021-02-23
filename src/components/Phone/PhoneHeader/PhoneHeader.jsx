@@ -1,5 +1,14 @@
-export const PhoneHeader = () => {
+import { useSelector } from "react-redux";
+import { OnlineIndicator } from "./OnlineIndicator/OnlineIndicator";
+import classes from "./PhoneHeader.module.scss";
+
+export const PhoneHeader = ({registered}) => {
+  const name = useSelector((state) => state.phone.config.name);
+
   return (
-    <header className="bg-figmaBlue position: absolute top-0 left-0 w-full h-7 text-white">React phone</header>
-  )
-}
+    <div className={`${classes.phoneHeader} w-full`}>
+      <OnlineIndicator registered={registered} />
+      {name}
+    </div>
+  );
+};

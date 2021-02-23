@@ -1,5 +1,3 @@
-import classes from "./PhoneButtons.module.scss";
-import { useEffect, useState } from "react";
 import { debounce } from "../../../helpers/debounce";
 import { Dialpad } from "./Dialpad/Dialpad";
 import { ControlButtons } from "./ControlButtons/ControlButtons";
@@ -14,10 +12,6 @@ export const PhoneButtons = ({
   callProgress,
   hangUp,
 }) => {
-  const [prevent, setPrevent] = useState(false);
-
-  let timer = null,
-    delay = 300;
 
   const handleClick = async (e) => {
     debounce(() => handleChange(e));

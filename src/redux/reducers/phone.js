@@ -1,4 +1,4 @@
-import { CLEAR_PHONE_NUMBER, SET_CONFIG, SET_PHONE_NUMBER } from "../types";
+import { CLEAR_PHONE_NUMBER, SET_CALL_STATUS, SET_CONFIG, SET_PHONE_NUMBER } from "../types";
 
 let initialState = {
   config: null,
@@ -13,7 +13,9 @@ export const phoneReducer = (state = initialState, action) => {
     case SET_PHONE_NUMBER:
       return { ...state, phoneNumber: `${state.phoneNumber + action.number}` };
     case CLEAR_PHONE_NUMBER:
-      return {...state, phoneNumber: state.phoneNumber.slice(0, -1)}
+      return {...state, phoneNumber: state.phoneNumber.slice(0, -1)};
+    case SET_CALL_STATUS:
+      return {...state, callStatus: action.status};
     default:
       return state;
   }

@@ -2,15 +2,20 @@ import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 // import IncomigCallSound from "../../assets/COMTelph_Tone ringback tone 1 (ID 1614)_BSB.mp3";
 // import uaCreator from "../../helpers/uaCreator";
-import { clearPhoneNumber, setPhoneNumber } from "../../redux/actions/phone";
+import { clearPhoneNumber, setCallStatus, setPhoneNumber } from "../../redux/actions/phone";
 import { PhoneButtons } from "./PhoneButtons/PhoneButtons";
 import { PhoneInput } from "./PhoneInput/PhoneInput";
 import { PhoneHeader } from "./PhoneHeader/PhoneHeader";
-import { uaCreator } from "../../helpers/uaCreator";
+import { useUaCreator } from "../../helpers/uaCreator";
 import classes from "./Phone.module.scss";
 import { NavigationButtons } from "./NavigationButtons/NavigationButtons";
 
 export const Phone = ({ config }) => {
+  const phoneNumber = useSelector((state) => state.phone.phoneNumber);
+  const callStatus = useSelector(state => state.phone.callStatus);
+  const dispatch = useDispatch();
+  const phoneRef = useRef();
+
   const [state, setState] = useState({
     session: null,
     accept: false,
@@ -26,71 +31,40 @@ export const Phone = ({ config }) => {
     },
   });
 
-  const [callData, setCallData] = useState({
-    status: "",
-  });
-
-  const dispatch = useDispatch();
-
-  const phoneRef = useRef();
-
-  const { ua, remoteAudio, session } = uaCreator(config);
-
-  const phoneNumber = useSelector((state) => state.phone.phoneNumber);
-
-  // const socket = new JsSip.WebSocketInterface(config.host);
-  // const configurations = {
-  //   sockets: [socket],
-  //   uri: config.uri,
-  //   password: config.password,
-  // };
-
-  // const remoteAudio = new window.Audio();
-  // remoteAudio.autoplay = true;
-  // remoteAudio.addEventListener("canplaythrough", event => {
-  //   remoteAudio.play();
-  // });
-
-  // const ua = new JsSip.UA(configurations);
-
-  // ua.on("connected", () => console.log("Connected!"));
-
-  // ua.on("disconnected", () => console.log("Disconnected!"));
-
-  // ua.start();
+  const { ua, active_call, call_status, callStart, registered } = useUaCreator(config);
 
   const handleCallStatus = (status, clear) => {
-    setCallData({ ...state, status: status });
+    dispatch(setCallStatus(status))
     if (clear) {
-      setTimeout(() => setCallData({ ...state, status: "" }), 4000);
+      setTimeout(() => dispatch(setCallStatus(null)), 4000);
     }
   };
 
-  const eventHandlers = {
-    progress: (e) => {
-      console.log(e);
-      console.log("Call in progress");
-      handleCallStatus("progress");
-    },
-    failed: (e) => {
-      console.log(e);
-      console.log("Call failed");
-      handleCallStatus("failed", true);
-    },
-    ended: (e) => {
-      console.log(e);
-      console.log("Call ended");
-      handleCallStatus("ended", true);
-    },
-    confirmed: (e) => {
-      console.log(e);
-      console.log("Call confirmed");
-      handleCallStatus("confirmed");
-    },
-  };
+  // const eventHandlers = {
+  //   progress: (e) => {
+  //     console.log(e);
+  //     console.log("Call in progress");
+  //     handleCallStatus("progress");
+  //   },
+  //   failed: (e) => {
+  //     console.log(e);
+  //     console.log("Call failed");
+  //     handleCallStatus("failed", true);
+  //   },
+  //   ended: (e) => {
+  //     console.log(e);
+  //     console.log("Call ended");
+  //     handleCallStatus("ended", true);
+  //   },
+  //   confirmed: (e) => {
+  //     console.log(e);
+  //     console.log("Call confirmed");
+  //     handleCallStatus("confirmed");
+  //   },
+  // };
 
   const options = {
-    eventHandlers: eventHandlers,
+    // eventHandlers: eventHandlers,
     mediaConstraints: { audio: true, video: false },
   };
 
@@ -98,17 +72,15 @@ export const Phone = ({ config }) => {
     if (phoneNumber.length >= 9) {
       ua.call(phoneNumber, options);
     }
-    state.session &&
-      state.session.connection.addEventListener("addstream", (e) => {
-        remoteAudio.src = e.streams[0];
-        remoteAudio.play();
-      });
+    // state.session &&
+    //   state.session.connection.addEventListener("addstream", (e) => {
+    //     remoteAudio.src = e.streams[0];
+    //     remoteAudio.play();
+    //   });
   };
 
   const hangUp = () => {
-    if (session) {
-      session.terminate();
-    }
+    console.log("hang up")
   };
 
   const clearNumber = () => dispatch(clearPhoneNumber());
@@ -166,9 +138,9 @@ export const Phone = ({ config }) => {
         style={state.drag.styles}
         ref={phoneRef}
       >
-        {/* <PhoneHeader /> */}
+        <PhoneHeader registered={registered} />
         <PhoneInput phoneNumber={phoneNumber} />
-        {callData.status}
+        {callStatus && callStatus}
         <PhoneButtons
           handleChange={handleChangePhoneNumber}
           handleSubElement={handleSubElement}
@@ -176,7 +148,7 @@ export const Phone = ({ config }) => {
           clearNumber={clearNumber}
           handleKeyboard={handleShowKeyboard}
           isHideKeyboard={state.showKeyboard}
-          callProgress={callData.status}
+          callProgress={callStatus && callStatus}
           hangUp={hangUp}
         />
         <NavigationButtons />
