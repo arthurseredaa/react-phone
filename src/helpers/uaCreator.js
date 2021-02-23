@@ -1,39 +1,37 @@
-import JsSip from 'jssip';
-​
-export default async function uaCreator(config) {
-  let oSipAudio = document.createElement('audio');
-  let oSoundAudio = document.createElement('audio');
-  oSoundAudio.src = config.sound;
-  oSoundAudio.loop = true;
-  let socket = new JsSip.WebSocketInterface(config.host);
-  socket.via_transport = config.via_transport || 'WS';
-  let connectionConfig = {
+import JsSip from "jssip";
+
+export const uaCreator = (config) => {
+  const socket = new JsSip.WebSocketInterface(config.host);
+  const configurations = {
     sockets: [socket],
     uri: config.uri,
-    name: config.name,
     password: config.password,
-    realm: config.realm,
-    register_expires: config.register_expires,
-    session_timers_refresh_method: config.session_timers_refresh_method,
   };
-  let callOptions = {
-    mediaConstraints: { audio: true, video: false },
-    pcConfig: {
-      iceServers: [
-        {
-          urls: ['stun:stun.l.google.com:19302'],
-        },
-        { ...config.turn },
-      ],
-    },
-  };
-  return {
-    ua: new JsSip.UA(connectionConfig),
-    audio: {
-      call: oSipAudio,
-      sounds: oSoundAudio,
-    },
-    callOptions: callOptions,
-    config,
-  };
-}
+
+  const remoteAudio = new window.Audio();
+  remoteAudio.autoplay = true;
+  remoteAudio.addEventListener("canplaythrough", (event) => {
+    remoteAudio.play();
+  });
+
+  const ua = new JsSip.UA(configurations);
+
+  ua.on("connected", (e) => {
+    console.log("Connected!");
+  });
+
+  ua.on("disconnected", (e) => {
+    console.log("Disconnected!")
+    console.log(e)
+  });
+
+  let session;
+
+  ua.on("newRTCSession", (data) => {
+    session = data.session
+  })
+
+  ua.start();
+
+  return { ua, remoteAudio, session };
+};
